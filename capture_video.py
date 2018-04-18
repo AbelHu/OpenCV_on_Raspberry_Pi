@@ -25,10 +25,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     image = frame.array
     image = cv2.flip(image, 0)
 
-    if frame_id % 20 == 0:
+    if frame_id % 30 == 0:
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         faces = face_cascade.detectMultiScale(gray, 1.1, 5)
-    if faces:
+    if faces is not None and len(faces) > 0:
         for (x, y, w, h) in faces:
             image = cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
