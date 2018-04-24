@@ -4,7 +4,7 @@ from picamera import PiCamera
 import time
 import cv2
 from common import draw_str
-from kafka import KafkaProducer
+#from kafka import KafkaProducer
 from time import gmtime, strftime
 
 # initialize the camera and grab a reference to the raw camera capture
@@ -12,8 +12,8 @@ camera = PiCamera()
 camera.resolution = (640, 480)
 camera.framerate = 32
 rawCapture = PiRGBArray(camera, size=(640, 480))
-producer = KafkaProducer(bootstrap_servers=['10.156.91.65:9092'], api_version=(0, 10))
-num_faces = 0
+#producer = KafkaProducer(bootstrap_servers=['10.156.91.65:9092'], api_version=(0, 10))
+#num_faces = 0
 
 # allow the camera to warmup
 time.sleep(0.1)
@@ -32,20 +32,20 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     #if frame_id % 30 == 0:
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, 1.2, 5)
-    cur_num_faces = len(faces)
+    #cur_num_faces = len(faces)
 
     if faces is not None and len(faces) > 0:
         for (x, y, w, h) in faces:
             image = cv2.rectangle(image, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
-    if cur_num_faces > num_faces:
-        message = "[{}] Detected {} face(s).".format(strftime("%Y-%m-%d %H:%M:%S", gmtime()), cur_num_faces)
-        b_msg = bytearray()
-        b_msg.extend(map(ord, message))
-        producer.send('test', b_msg)
-        producer.flush()
+    # if cur_num_faces > num_faces:
+    #     message = "[{}] Detected {} face(s).".format(strftime("%Y-%m-%d %H:%M:%S", gmtime()), cur_num_faces)
+    #     b_msg = bytearray()
+    #     b_msg.extend(map(ord, message))
+    #     producer.send('test', b_msg)
+    #     producer.flush()
 
-    num_faces = cur_num_faces
+    #num_faces = cur_num_faces
     end = time.time()
     seconds = end - start
     fps = 1.0 / seconds
