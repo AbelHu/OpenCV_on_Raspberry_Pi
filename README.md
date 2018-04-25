@@ -5,12 +5,12 @@
 
 ### Rapsberry PI：
 ```shell
-raspivid -fps 26 -h 450 -w 600 -vf -n -t 0 -b 200000 -o - | gst-launch-1.0 -v fdsrc ! h264parse ! rtph264pay ! gdppay ! tcpserversink host=10.172.2.127 port=5000
+raspivid -n -t 0 -rot 180 -w 960 -h 720 -fps 30 -b 6000000 -o - | gst-launch-1.0 -e -vvvv fdsrc ! h264parse ! rtph264pay pt=96 config-interval=5 ! udpsink host=10.156.91.78 port=5000
 ```
 
 ### Desktop PC:
 ```shell
-gst-launch-0.10 -v tcpclientsrc host=10.172.2.127 port=5000 ! gdpdepay ! rtph264depay ! ffdec_h264 ! ffmpegcolorspace ! autovideosink sync=false
+gst-launch-1.0 -e -v udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264 ! fpsdisplaysink sync=false text-overlay=false
 ```
 
 ## Desktop PC -> Desktop PC
