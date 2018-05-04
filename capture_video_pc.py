@@ -6,7 +6,7 @@ from common import draw_str
 from time import gmtime, strftime
 
 # initialize the camera and grab a reference to the raw camera capture
-cap = cv.VideoCapture('udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! decodebin  ! appsink', cv.CAP_GSTREAMER)
+cap = cv.VideoCapture('udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264  ! videoconvert  ! queue ! appsink sync=false ', cv.CAP_GSTREAMER)
 #producer = KafkaProducer(bootstrap_servers=['10.156.91.65:9092'], api_version=(0, 10))
 #num_faces = 0
 
