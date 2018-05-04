@@ -1,51 +1,42 @@
 # import the necessary packages
 import time
 import cv2 as cv
-from common import draw_str
-#from kafka import KafkaProducer
-from time import gmtime, strftime
+import dlib
+from utils import apply_offsets
+from utils import draw_bounding_box
+from utils import draw_str
+from utils import rect_to_bb
+
 
 # initialize the camera and grab a reference to the raw camera capture
 cap = cv.VideoCapture('udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitterbuffer ! rtph264depay ! avdec_h264  ! videoconvert  ! queue ! appsink sync=false ', cv.CAP_GSTREAMER)
-#producer = KafkaProducer(bootstrap_servers=['10.156.91.65:9092'], api_version=(0, 10))
-#num_faces = 0
+detector = dlib.get_frontal_face_detector()
 
-# face_cascade = cv.CascadeClassifier(
-#     r'C:\Users\foamliu.FAREAST\code\3rd-party\opencv\data\haarcascades\haarcascade_frontalface_alt.xml')
-#
-# start = time.time()
-#frame_id = 0
+start = time.time()
+frame_id = 0
 # capture frames from the camera
 while True:
     ret, frame = cap.read()
+    faces = detector(frame, 1)
 
-    # gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    # faces = face_cascade.detectMultiScale(gray, 1.2, 5)
-    # cur_num_faces = len(faces)
-    # if faces is not None and cur_num_faces > 0:
-    #     for (x, y, w, h) in faces:
-    #         image = cv.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
-    #
-    # if cur_num_faces > num_faces:
-    #     message = "[{}] Detected {} face(s).".format(strftime("%Y-%m-%d %H:%M:%S", gmtime()), cur_num_faces)
-    #     b_msg = bytearray()
-    #     b_msg.extend(map(ord, message))
-    #     producer.send('test', b_msg)
-    #     producer.flush()
-    #
-    # num_faces = cur_num_faces
-    #
-    # end = time.time()
-    # seconds = end - start
-    # fps = 1.0 / seconds
-    # draw_str(frame, (20, 20), 'fps: %d' % (fps))
+    for rect in faces:
+        (x, y, w, h) = rect_to_bb(rect)
+        x1, x2, y1, y2 = apply_offsets((x, y, w, h), (20, 40))
+        color = (0, 255, 0)
+        draw_bounding_box(image=frame, coordinates=(x1, y1, x2 - x1, y2 - y1), color=color)
+
+    num_faces = len(faces)
+    end = time.time()
+    seconds = end - start
+    fps = 1.0 / seconds
+    draw_str(frame, (20, 20), 'fps: %d' % (fps))
 
     # show the frame
     cv.imshow("Frame", frame)
     key = cv.waitKey(1) & 0xFF
 
-    #start = time.time()
-    #frame_id += 1
+    start = time.time()
+    frame_id += 1
 
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
