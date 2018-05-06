@@ -29,7 +29,7 @@ gst-launch-1.0 -e -v udpsrc port=5000 ! application/x-rtp, payload=96 ! rtpjitte
 
 ### Rapsberry PI：
 ```shell
-raspivid -n -t 0 -rot 180 -w 960 -h 720 -fps 30 -b 6000000 -o - | gst-launch-1.0 -e -vvvv fdsrc ! h264parse ! rtph264pay pt=96 config-interval=5 ! udpsink host=10.156.91.65 port=5000
+raspivid -n -t 0 -rot 180 -w 960 -h 720 -fps 10 -b 6000000 -o - | gst-launch-1.0 -e -v fdsrc do-timestamp=true ! h264parse ! rtph264pay pt=96 config-interval=5 ! udpsink host=10.156.91.65 port=5000
 ```
 
 ### AzS managed Linux VM:
